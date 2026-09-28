@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    ================================================================
+    MediFind — Multi-Pharmacy Medicine Availability & Reservation Platform
+    Maven Project Object Model (POM)
+
+    SLP: Core Platform & Shared Engine
+    Story: "Set up 3-tier project skeleton (Spring Boot, MVC, REST)"
+
+    This file tells Maven:
+      1. Which Spring Boot version to build against (the <parent> tag).
+         Spring Boot's "parent POM" pre-picks compatible versions for
+         dozens of libraries, so we normally do NOT write <version>
+         tags ourselves below — Spring Boot chooses one that is known
+         to work together. This saves a CSE student from "dependency
+         hell" (two libraries silently expecting different versions
+         of a third library).
+      2. Which dependencies (external libraries) the project needs.
+      3. How to package the app (as a single runnable .jar with an
+         embedded Tomcat web server inside it — no separate server
+         install needed).
+    ================================================================
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <!-- Every Spring Boot project inherits sensible defaults from this parent. -->
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>3.5.15</version>
+        <relativePath/>
+    </parent>
+
+    <groupId>com.medifind</groupId>
+    <artifactId>medifind</artifactId>
+    <version>1.0.0</version>
+    <name>MediFind</name>
+    <description>Multi-Pharmacy Medicine Availability &amp; Reservation Platform</description>
+
+    <properties>
+        <!-- Spring Boot 3.5.x requires Java 17 or newer. Java 21 (LTS) also works. -->
+        <java.version>17</java.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
+    <dependencies>
+        <!-- ============================================================
+             WEB LAYER — Spring MVC + embedded Tomcat + Thymeleaf views.
+             This is what lets @Controller classes handle HTTP requests
+             and render server-side HTML pages.
+             ============================================================ -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-thymeleaf</artifactId>
+        </dependency>
+
+        <!-- ============================================================
+             DATA ACCESS LAYER — Spring Data JPA (built on Hibernate).
+             Lets us write Repository *interfaces* instead of hand-written
+             SQL/JDBC boilerplate for basic CRUD operations.
+             ============================================================ -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
+        </dependency>
+
+        <!-- MySQL JDBC driver. "runtime" scope: only needed when the app
+             actually runs, not while compiling our own code. -->
+        <dependency>
+            <groupId>com.mysql</groupId>
+            <artifactId>mysql-connector-j</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+
+        <!-- ============================================================
+             SECURITY — authentication, password hashing (BCrypt),
+             role-based access control, session management.
+             ============================================================ -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
+        </dependency>
+        <!-- Adds the sec:authorize="..." attribute inside Thymeleaf pages,
+             so a template can show/hide HTML based on the logged-in user's role. -->
+        <dependency>
+            <groupId>org.thymeleaf.extras</groupId>
+            <artifactId>thymeleaf-extras-springsecurity6</artifactId>
+        </dependency>
+
+        <!-- Bean Validation (@NotBlank, @Email, @Positive, ...) for DTOs. -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-validation</artifactId>
+        </dependency>
+
+        <!-- ============================================================
+             REPORTING — generates the PDF export for Admin reports
+             (SLP: Admin Reporting & Configuration → "Export reports as CSV/PDF").
+             CSV export needs no library; plain Java text writing is enough.
+             ============================================================ -->
+        <dependency>
+            <groupId>com.github.librepdf</groupId>
+            <artifactId>openpdf</artifactId>
+            <version>2.0.4</version>
+        </dependency>
+
+        <!-- ============================================================
+             DEVELOPER QUALITY-OF-LIFE — auto-restarts the app when you
+             recompile a class, so you don't have to stop/start manually.
+             "optional=true" means it never gets bundled into the final
+             production .jar that you would deploy.
+             ============================================================ -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-devtools</artifactId>
+            <scope>runtime</scope>
+            <optional>true</optional>
+        </dependency>
+
+        <!-- ============================================================
+             TESTING — JUnit 5, Mockito, Spring Test, AssertJ, all bundled.
+             ============================================================ -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- In-memory database used ONLY by the "test" profile (see
+             src/test/resources/application-test.properties), so `mvn test`
+             works immediately after cloning the project — before MySQL has
+             even been installed. The app itself always runs against real
+             MySQL; H2 never touches dev/prod data. -->
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <finalName>medifind</finalName>
+        <plugins>
+            <!-- Packages the app as an executable "fat jar" you run with
+                 `java -jar medifind.jar` — the embedded Tomcat server is
+                 bundled inside, so no external app-server install is needed. -->
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>
