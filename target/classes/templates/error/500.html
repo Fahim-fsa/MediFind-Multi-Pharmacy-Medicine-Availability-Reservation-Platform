@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Something broke')}"></head>
+<body>
+<div th:replace="~{fragments/layout :: publicNav}"></div>
+<div class="container" style="padding:80px 24px; text-align:center;">
+    <h1>500 — Something broke on our end</h1>
+    <p class="text-muted">Please try again in a moment. If this keeps happening, check the application console log for details.</p>
+    <a th:href="@{/}" class="btn btn-primary">Back to MediFind</a>
+</div>
+<div th:replace="~{fragments/layout :: scripts}"></div>
+</body>
+</html>
