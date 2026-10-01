@@ -1,0 +1,26 @@
+<svg viewBox="0 0 48 60" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="MediFind">
+    <!-- Map pin silhouette: a circle (head) plus an overlapping triangle
+         (point), both the same solid fill, so the seam between them is
+         invisible — simpler and more reliable than hand-tuned bezier
+         curves for an app icon this small. -->
+    <circle cx="24" cy="22" r="20" fill="#0e7c66"/>
+    <polygon points="15,34 33,34 24,58" fill="#0e7c66"/>
+
+    <!-- Inner disc gives the capsule contrast against the pin, and lets
+         the whole mark read clearly on both light and dark backgrounds. -->
+    <circle cx="24" cy="22" r="13" fill="#ffffff"/>
+
+    <!-- Two-tone medicine capsule, tilted for a little energy. -->
+    <g transform="rotate(-30 24 22)">
+        <defs>
+            <clipPath id="mfPillClip">
+                <rect x="13" y="16.5" width="22" height="11" rx="5.5"/>
+            </clipPath>
+        </defs>
+        <g clip-path="url(#mfPillClip)">
+            <rect x="13" y="16.5" width="11" height="11" fill="#0e7c66"/>
+            <rect x="24" y="16.5" width="11" height="11" fill="#e4f2ee"/>
+        </g>
+        <rect x="13.6" y="17.1" width="20.8" height="9.8" rx="4.9" fill="none" stroke="#0e7c66" stroke-width="1.4"/>
+    </g>
+</svg>
