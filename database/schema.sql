@@ -2,19 +2,6 @@
 -- MediFind — reference database schema
 --
 -- SLP: Core Platform & Shared Engine → "Design MySQL database schema"
---
--- You do NOT need to run this file to use the app: with the default
--- "dev" profile, Hibernate reads the @Entity classes under
--- src/main/java/com/medifind/entity and creates/updates these same
--- tables automatically on startup (spring.jpa.hibernate.ddl-auto=update
--- in application-dev.properties).
---
--- This file exists as a reviewable, versioned reference — useful for
--- cross-checking against the project's ER diagram/SRS, for a
--- production setup (where application-prod.properties intentionally
--- uses ddl-auto=validate instead of auto-generating anything), or if
--- you later want to import it by hand:
---   mysql -u root -p medifind_db < database/schema.sql
 -- =====================================================================
 
 CREATE DATABASE IF NOT EXISTS medifind_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
