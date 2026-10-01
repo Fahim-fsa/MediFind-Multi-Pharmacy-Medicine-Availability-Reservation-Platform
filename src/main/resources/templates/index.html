@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('MediFind — Find medicine nearby, reserve it in seconds')}"></head>
+<body>
+<div th:replace="~{fragments/layout :: publicNav}"></div>
+
+<section class="hero">
+    <div class="container hero-grid">
+        <div>
+            <h1>Know before you go — find medicine nearby, reserve it in seconds.</h1>
+            <p class="lede">MediFind compares price and stock across pharmacies near you in real time, so you can stop calling around and start walking straight to the counter with a confirmation code in hand.</p>
+            <div class="flex gap-12">
+                <a th:href="@{/auth/register/patient}" class="btn btn-primary">Find medicine as a patient</a>
+                <a th:href="@{/auth/register/pharmacist}" class="btn btn-secondary">List your pharmacy</a>
+            </div>
+        </div>
+        <div>
+            <svg viewBox="0 0 360 320" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Illustration of a map pin over a medicine capsule">
+                <circle cx="180" cy="160" r="150" fill="var(--color-primary-light)"/>
+                <g transform="translate(60,60)">
+                    <rect x="0" y="70" width="240" height="150" rx="14" fill="var(--color-surface)" stroke="var(--color-border)"/>
+                    <rect x="20" y="95" width="200" height="14" rx="7" fill="var(--color-border)"/>
+                    <rect x="20" y="120" width="140" height="10" rx="5" fill="var(--color-border)"/>
+                    <rect x="20" y="140" width="160" height="10" rx="5" fill="var(--color-border)"/>
+                    <g transform="translate(150,10)">
+                        <path d="M40 0 C62 0 80 18 80 40 C80 68 40 108 40 108 C40 108 0 68 0 40 C0 18 18 0 40 0 Z" fill="var(--color-accent)"/>
+                        <circle cx="40" cy="40" r="16" fill="var(--color-surface)"/>
+                    </g>
+                    <g transform="translate(20,10)">
+                        <rect x="0" y="18" width="60" height="28" rx="14" fill="var(--color-primary)"/>
+                        <rect x="0" y="18" width="30" height="28" rx="14" fill="var(--color-primary-dark)"/>
+                    </g>
+                </g>
+            </svg>
+        </div>
+    </div>
+</section>
+
+<section class="container" style="padding: 56px 24px;">
+    <h2>How it works</h2>
+    <div class="two-col" style="grid-template-columns: repeat(3, 1fr);">
+        <div class="flex gap-12">
+            <span class="step-number">1</span>
+            <div>
+                <h3>Search</h3>
+                <p>Look up a medicine by name, generic name, or brand and see every nearby pharmacy that has it in stock.</p>
+            </div>
+        </div>
+        <div class="flex gap-12">
+            <span class="step-number">2</span>
+            <div>
+                <h3>Reserve</h3>
+                <p>Compare price and distance, then reserve the quantity you need — pay online or at the counter.</p>
+            </div>
+        </div>
+        <div class="flex gap-12">
+            <span class="step-number">3</span>
+            <div>
+                <h3>Collect</h3>
+                <p>Show your confirmation code at the pharmacy and collect your order — no more calling ahead.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section style="background: var(--color-surface-alt); padding: 56px 0; border-top:1px solid var(--color-border); border-bottom:1px solid var(--color-border);">
+    <div class="container two-col">
+        <div class="card">
+            <h3>For patients</h3>
+            <p>Stop calling from pharmacy to pharmacy. See live price and stock, filter by distance, and hold your order with a reservation before you leave home.</p>
+            <a th:href="@{/auth/register/patient}" class="btn btn-primary btn-sm">Create a patient account</a>
+        </div>
+        <div class="card">
+            <h3>For pharmacies</h3>
+            <p>List your inventory, get notified the moment a patient reserves something, and cut down on walk-ins asking for medicine you don't carry.</p>
+            <a th:href="@{/auth/register/pharmacist}" class="btn btn-secondary btn-sm">Register your pharmacy</a>
+        </div>
+    </div>
+</section>
+
+<section class="container" style="padding: 56px 24px; text-align:center;">
+    <h2>Ready to find what you need?</h2>
+    <p class="text-muted" style="max-width:480px; margin:0 auto 20px;">Join MediFind today — it takes less than a minute to create an account.</p>
+    <a th:href="@{/auth/register}" class="btn btn-primary">Get started</a>
+</section>
+
+<div th:replace="~{fragments/layout :: publicFooter}"></div>
+<div th:replace="~{fragments/layout :: scripts}"></div>
+</body>
+</html>
