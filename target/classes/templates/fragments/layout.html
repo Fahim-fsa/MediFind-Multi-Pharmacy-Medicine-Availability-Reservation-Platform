@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<!--
+  SLP: Core Platform & Shared Engine → "Set up 3-tier project skeleton"
+  SLP: UI/UX Design
+-->
+<html xmlns:th="http://www.thymeleaf.org">
+
+    <!--/* ===================================================
+         FRAGMENT: head(pageTitle)
+         =================================================== */-->
+    <head th:fragment="head(pageTitle)">
+        <meta charset="UTF-8"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1"/>
+
+        <title th:text="${pageTitle} + ' · MediFind'">MediFind</title>
+
+        <link rel="stylesheet" th:href="@{/css/style.css}"/>
+
+        <!-- Simplified single-tone version of /images/logo.svg (no clipPath/#fragment
+             refs, which need extra percent-encoding to survive safely in a data: URI). -->
+        <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 48 60%22%3E%3Ccircle cx=%2224%22 cy=%2222%22 r=%2220%22 fill=%22%230e7c66%22/%3E%3Cpolygon points=%2215,34 33,34 24,58%22 fill=%22%230e7c66%22/%3E%3Ccircle cx=%2224%22 cy=%2222%22 r=%2213%22 fill=%22%23ffffff%22/%3E%3Crect x=%2213%22 y=%2216.5%22 width=%2222%22 height=%2211%22 rx=%225.5%22 fill=%22%230e7c66%22 transform=%22rotate(-30 24 22)%22/%3E%3C/svg%3E"/>
+
+        <script>
+            (function () {
+                try {
+                    var saved = localStorage.getItem('medifind-theme');
+                    var theme = saved ||
+                        (window.matchMedia('(prefers-color-scheme: dark)').matches
+                            ? 'dark'
+                            : 'light');
+
+                    document.documentElement.setAttribute('data-theme', theme);
+                } catch (e) {
+                }
+            })();
+        </script>
+    </head>
+
+<!--/* ===================================================
+     FRAGMENT: publicNav — landing + auth pages
+     =================================================== */-->
+<header th:fragment="publicNav" class="site-header">
+    <div class="container">
+        <a th:href="@{/}" class="brand">
+            <img th:src="@{/images/logo.svg}" class="brand-mark" alt=""/> MediFind
+        </a>
+        <nav>
+            <a th:href="@{/}">Home</a>
+            <a th:href="@{/auth/login}">Sign in</a>
+            <a th:href="@{/auth/register}" class="btn btn-primary btn-sm">Get started</a>
+            <button type="button" id="theme-toggle" class="theme-toggle" aria-label="Toggle dark mode">
+                <span class="icon-sun">☀</span><span class="icon-moon">☾</span>
+            </button>
+        </nav>
+    </div>
+</header>
+
+<!--/* ===================================================
+     FRAGMENT: alerts — flash "success"/"error" messages
+     Reads them straight from the model; no params needed since a
+     fragment shares the including template's context.
+     =================================================== */-->
+<div th:fragment="alerts">
+    <div class="alert alert-success" th:if="${success != null}" th:text="${success}"></div>
+    <div class="alert alert-error" th:if="${error != null}" th:text="${error}"></div>
+</div>
+
+<!--/* ===================================================
+     FRAGMENT: sidebarPatient(active)
+     =================================================== */-->
+<aside th:fragment="sidebarPatient(active)" class="sidebar">
+    <a th:href="@{/}" class="brand">
+        <img th:src="@{/images/logo.svg}" class="brand-mark" alt=""/> MediFind
+    </a>
+    <div class="sidebar-section">
+        <div class="sidebar-label">Patient</div>
+        <a th:href="@{/patient/dashboard}" class="nav-link" th:classappend="${active == 'dashboard'} ? 'active'">Dashboard</a>
+        <a th:href="@{/patient/search}" class="nav-link" th:classappend="${active == 'search'} ? 'active'">Search medicine</a>
+        <a th:href="@{/patient/pharmacy-map}" class="nav-link" th:classappend="${active == 'map'} ? 'active'">Pharmacy map</a>
+        <a th:href="@{/patient/reservations}" class="nav-link" th:classappend="${active == 'reservations'} ? 'active'">My reservations</a>
+        <a th:href="@{/patient/notifications}" class="nav-link" th:classappend="${active == 'notifications'} ? 'active'">Notifications</a>
+        <a th:href="@{/patient/profile}" class="nav-link" th:classappend="${active == 'profile'} ? 'active'">My profile</a>
+    </div>
+    <div class="sidebar-section sidebar-footer">
+        <form th:action="@{/auth/logout}" method="post">
+            <button type="submit" class="nav-link btn-ghost" style="width:100%; text-align:left; border:none; cursor:pointer;">Sign out</button>
+        </form>
+    </div>
+</aside>
+
+<!--/* ===================================================
+     FRAGMENT: sidebarPharmacist(active)
+     =================================================== */-->
+<aside th:fragment="sidebarPharmacist(active)" class="sidebar">
+    <a th:href="@{/}" class="brand">
+        <img th:src="@{/images/logo.svg}" class="brand-mark" alt=""/> MediFind
+    </a>
+    <div class="sidebar-section">
+        <div class="sidebar-label">Pharmacy</div>
+        <a th:href="@{/pharmacist/dashboard}" class="nav-link" th:classappend="${active == 'dashboard'} ? 'active'">Dashboard</a>
+        <a th:href="@{/pharmacist/inventory}" class="nav-link" th:classappend="${active == 'inventory'} ? 'active'">Inventory</a>
+        <a th:href="@{/pharmacist/reservations}" class="nav-link" th:classappend="${active == 'reservations'} ? 'active'">Reservations</a>
+        <a th:href="@{/pharmacist/notifications}" class="nav-link" th:classappend="${active == 'notifications'} ? 'active'">Notifications</a>
+        <a th:href="@{/pharmacist/profile}" class="nav-link" th:classappend="${active == 'profile'} ? 'active'">Pharmacy profile</a>
+    </div>
+    <div class="sidebar-section sidebar-footer">
+        <form th:action="@{/auth/logout}" method="post">
+            <button type="submit" class="nav-link btn-ghost" style="width:100%; text-align:left; border:none; cursor:pointer;">Sign out</button>
+        </form>
+    </div>
+</aside>
+
+<!--/* ===================================================
+     FRAGMENT: sidebarAdmin(active)
+     =================================================== */-->
+<aside th:fragment="sidebarAdmin(active)" class="sidebar">
+    <a th:href="@{/}" class="brand">
+        <img th:src="@{/images/logo.svg}" class="brand-mark" alt=""/> MediFind
+    </a>
+    <div class="sidebar-section">
+        <div class="sidebar-label">Admin</div>
+        <a th:href="@{/admin/dashboard}" class="nav-link" th:classappend="${active == 'dashboard'} ? 'active'">Dashboard</a>
+        <a th:href="@{/admin/verification}" class="nav-link" th:classappend="${active == 'verification'} ? 'active'">Pharmacy verification</a>
+        <a th:href="@{/admin/users}" class="nav-link" th:classappend="${active == 'users'} ? 'active'">Users</a>
+        <a th:href="@{/admin/listings}" class="nav-link" th:classappend="${active == 'listings'} ? 'active'">Listings</a>
+        <a th:href="@{/admin/reservations}" class="nav-link" th:classappend="${active == 'reservations'} ? 'active'">Reservations</a>
+        <a th:href="@{/admin/reports}" class="nav-link" th:classappend="${active == 'reports'} ? 'active'">Reports</a>
+        <a th:href="@{/admin/audit-log}" class="nav-link" th:classappend="${active == 'audit'} ? 'active'">Audit log</a>
+        <a th:href="@{/admin/settings}" class="nav-link" th:classappend="${active == 'settings'} ? 'active'">Settings</a>
+    </div>
+    <div class="sidebar-section sidebar-footer">
+        <form th:action="@{/auth/logout}" method="post">
+            <button type="submit" class="nav-link btn-ghost" style="width:100%; text-align:left; border:none; cursor:pointer;">Sign out</button>
+        </form>
+    </div>
+</aside>
+
+<!--/* ===================================================
+     FRAGMENT: topbar(pageTitle) — sits above content in every
+     dashboard shell. Reads "unreadNotifications" and the Spring
+     Security "currentUser" principal straight from context.
+     =================================================== */-->
+<div th:fragment="topbar(pageTitle, notifUrl)" class="topbar">
+    <h2 class="mb-0" th:text="${pageTitle}">Page title</h2>
+    <div class="flex gap-12" style="align-items:center;">
+        <a th:href="@{${notifUrl}}" class="theme-toggle notification-dot" th:attr="data-count=${unreadNotifications}" aria-label="Notifications">🔔</a>
+        <!-- #authentication is provided automatically once thymeleaf-extras-springsecurity6
+             is on the classpath (see pom.xml) — no xmlns:sec needed for this expression form,
+             only for sec:xxx attributes, which this fragment doesn't use. -->
+        <span class="text-sm text-muted" th:text="${#authentication.name}">user@example.com</span>
+        <button type="button" id="theme-toggle" class="theme-toggle" aria-label="Toggle dark mode">
+            <span class="icon-sun">☀</span><span class="icon-moon">☾</span>
+        </button>
+    </div>
+</div>
+
+<!--/* ===================================================
+     FRAGMENT: scripts — placed just before </body> on every page
+     =================================================== */-->
+<th:block th:fragment="scripts">
+    <script th:src="@{/js/theme.js}"></script>
+</th:block>
+
+<footer th:fragment="publicFooter" style="border-top:1px solid var(--color-border); margin-top:60px; padding:28px 0; color:var(--color-ink-soft); font-size:0.85rem;">
+    <div class="container flex-between">
+        <span>&copy; 2026 MediFind — a university Software Engineering project.</span>
+        <span>Built with Spring Boot &amp; MySQL</span>
+    </div>
+</footer>
+
+</body>
+</html>
