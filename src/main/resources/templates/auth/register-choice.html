@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Create an account')}"></head>
+<body>
+<div th:replace="~{fragments/layout :: publicNav}"></div>
+
+<div class="auth-shell">
+    <div class="container-narrow" style="max-width:640px;">
+        <h2 style="text-align:center;">How will you use MediFind?</h2>
+        <div class="two-col" style="margin-top:24px;">
+            <a th:href="@{/auth/register/patient}" class="card" style="text-decoration:none;">
+                <h3>I'm a patient</h3>
+                <p class="text-sm">Search for medicine, compare pharmacies, and reserve what you need.</p>
+                <span class="btn btn-primary btn-sm">Register as a patient</span>
+            </a>
+            <a th:href="@{/auth/register/pharmacist}" class="card" style="text-decoration:none;">
+                <h3>I'm a pharmacy</h3>
+                <p class="text-sm">List your inventory and manage reservations from patients nearby.</p>
+                <span class="btn btn-secondary btn-sm">Register a pharmacy</span>
+            </a>
+        </div>
+        <p class="text-sm text-muted" style="text-align:center; margin-top:20px;">
+            Already have an account? <a th:href="@{/auth/login}">Sign in</a>
+        </p>
+    </div>
+</div>
+
+<div th:replace="~{fragments/layout :: scripts}"></div>
+</body>
+</html>
