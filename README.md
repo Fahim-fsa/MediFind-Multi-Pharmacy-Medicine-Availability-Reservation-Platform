@@ -53,7 +53,7 @@ com.medifind
 
 ### 3.1 Create the database
 
-You only need to create an **empty** database — Hibernate creates every table for you the first time the app starts (see §5, "Database setup" below for how this works).
+You only need to create an **empty** database — Hibernate creates every table for you the first time the app starts.
 
 ```sql
 CREATE DATABASE medifind_db CHARACTER SET utf8mb4;
@@ -75,7 +75,7 @@ spring.datasource.password=root
 mvn spring-boot:run
 ```
 
-The app starts on **http://localhost:8080**. The first startup automatically creates every table and seeds demo data (see §4) — this can take a few extra seconds the very first time.
+The app starts on **http://localhost:8080**. The first startup automatically creates every table and seeds demo data — this can take a few extra seconds the very first time.
 
 To build a standalone jar instead:
 
@@ -106,7 +106,7 @@ The app seeds itself with demo data on first run (see `DataSeeder.java`) so you 
 | Pharmacist — Popular Pharmacy (Mirpur) | `pharmacist3@medifind.com` | `Pharma@12345` | Deliberately left **pending**, so you have something to approve/reject in the Admin Portal |
 | Patient                             | *(register your own)*        | —              | Go to **/auth/register/patient** |
 
-The admin login is a **two-step** sign-in: after your password, MediFind "emails" a 6-digit one-time code. Since no real mail server is configured (see §6), that code is printed to the **application console/log** — look for a block that says `[SIMULATED EMAIL]` right after you submit the admin password form.
+The admin login is a **two-step** sign-in: after your password, MediFind "emails" a 6-digit one-time code. Since no real mail server is configured, that code is printed to the **application console/log** — look for a block that says `[SIMULATED EMAIL]` right after you submit the admin password form.
 
 ---
 
@@ -142,15 +142,6 @@ The brief scopes notifications as **"email notification simulation"** for this M
 - **Patients** — register/sign in, search medicine by name/generic/brand, filter by distance (browser geolocation, optional), see a Leaflet map of every verified pharmacy, reserve a medicine (cash or "online"), see a confirmation code, view/filter reservation history, cancel a reservation before pickup, edit their profile.
 - **Pharmacies** — register a new branch (goes to an admin verification queue) or join an existing branch as a second staff login, manage their own inventory (add/edit stock, price, availability, and an optional photo when first adding a medicine to the shared catalogue), see incoming reservations in a live-refreshing queue, mark a reservation collected or reject it, edit their pharmacy profile.
 - **Admins** — a two-step (password + emailed code) sign-in, approve/reject pharmacies, suspend/reactivate patient accounts, full CRUD over pharmacy listings (add one directly, edit its details, or delete it — blocked if it has reservation history to protect), browse every pharmacy's inventory and remove an inappropriate listing, view/cancel a disputed reservation, generate four reports (daily reservations, most-searched medicines, active pharmacies, active patients) each exportable as CSV or PDF, a full audit log of every sensitive admin action, and a small runtime-configurable settings page (pickup window length, low-stock threshold, notification wording).
-
-A full, story-by-story map of the Jira backlog to the exact files that implement each one lives in **[`docs/SLP_TRACEABILITY.md`](docs/SLP_TRACEABILITY.md)**.
-
-### A couple of deliberate design calls worth knowing about
-
-- **Stock is held the moment a reservation is placed, not when it's collected.** The brief's Pharmacy Dashboard section says stock should "decrease automatically" on collection — this project decrements it immediately on reservation instead (and restores it on cancel/expiry). Decrementing only at collection would let the same last unit be reserved by more people than the pharmacy actually has, since nothing would reflect a pending reservation in the meantime. See the Javadoc on `ReservationService` for the full reasoning.
-- **"SLP" tags in code comments and in the traceability doc refer to the Jira Epic/Story from the uploaded `MediFind_Jira__Stories.csv`** (12 epics, 78 stories) — that CSV didn't have a column literally called "SLP", so each comment cites the closest matching Epic + Story text from that sheet. If "SLP" meant something more specific in your course materials, the mapping is easy to re-label since every tag already names the exact story it refers to.
-- **Admin sign-in doesn't use Spring Security's built-in login form** — it's a custom two-step flow (see `AuthService` and `SecurityConfig`'s class comments) since a one-shot login can't express a "pause in the middle for a mailed code" step.
-- A few small, low-cost additions beyond the minimum brief: optimistic locking on stock rows (prevents two simultaneous edits from silently overwriting each other), login rate-limiting/lockout for every role, a runtime-editable settings table instead of hard-coded numbers, and Spring Boot Actuator's `/actuator/health` endpoint for basic monitoring.
 
 ---
 
@@ -188,4 +179,4 @@ medifind/
 
 ## 10. Academic note
 
-This project was developed to closely follow the team's own Software Requirements Specification and Jira backlog. Comments throughout the code reference the specific backlog Epic/Story each part implements — use `docs/SLP_TRACEABILITY.md` as the starting point when presenting or extending this project.
+This project was developed to closely follow the team's own Software Requirements Specification and Jira backlog.
