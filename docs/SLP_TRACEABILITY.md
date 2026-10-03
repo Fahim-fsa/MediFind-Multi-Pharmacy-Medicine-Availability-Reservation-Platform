@@ -138,7 +138,7 @@ Status legend: ✅ implemented · ⚠️ implemented with a caveat (see note) ·
 |---|---|---|
 | System monitoring & threat protection | ⚠️ | Spring Boot Actuator `/actuator/health` + `/actuator/info` (`application.properties`) — a course-project-appropriate baseline, not a full APM/WAF |
 | Limit patient data exposed during reservation | ✅ | `ReservationQueueItem` DTO (masked phone, no email/id exposed), `ReservationService.toQueueItem`/`maskPhone` |
-| Automated database backup & recovery | ⚠️ | `scripts/backup.sh`/`restore.sh` (mysqldump wrappers) — "automated" in the sense of being one command to run from cron/Task Scheduler, not a managed cloud backup service |
+| Automated database backup & recovery | ⚠️ | `scripts/backup.sh`/`restore.sh` (mysqldump wrappers) — "automated" in the sense of being one command t#o run from cron/Task Scheduler, not a managed cloud backup service |
 | Platform-wide audit logging | ✅ | `AuditLog` entity, `AuditLogService`, `templates/admin/audit-log.html` |
 | Role-based access control (RBAC) framework | ✅ | `Role` enum, `CustomUserDetails.getAuthorities`, `SecurityConfig.authorizeHttpRequests` |
 | Enforce HTTPS/TLS across the platform | ⚠️ | Commented-out `server.ssl.*` block in `application-prod.properties`, ready to enable with a real certificate — not turned on by default since that needs a cert this project can't generate for you (see README §7) |
