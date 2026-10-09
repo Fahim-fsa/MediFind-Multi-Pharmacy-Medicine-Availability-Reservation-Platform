@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head(${medicine.name})}"></head>
+<body>
+<div class="app-shell">
+    <div th:replace="~{fragments/layout :: sidebarPatient('search')}"></div>
+    <div class="main-content">
+        <div th:replace="~{fragments/layout :: topbar(${medicine.name}, '/patient/notifications')}"></div>
+        <div class="content-body">
+            <div th:replace="~{fragments/layout :: alerts}"></div>
+
+            <div class="card" style="margin-bottom:20px;">
+                <div class="flex gap-12" style="align-items:center;">
+                    <img th:if="${medicine.imageUrl}" th:src="@{${medicine.imageUrl}}" class="medicine-thumb" alt=""
+                         style="width:64px; height:64px;"/>
+                    <span th:unless="${medicine.imageUrl}" class="medicine-thumb medicine-thumb-placeholder" aria-hidden="true"
+                          style="width:64px; height:64px; font-size:30px;">💊</span>
+                    <div>
+                        <h2 class="mt-0 mb-0" th:text="${medicine.name}">Napa</h2>
+                        <p class="text-sm text-muted mb-0">
+                            <span th:text="'Generic: ' + ${medicine.genericName}">Generic: Paracetamol</span>
+                            <span th:if="${medicine.brand}" th:text="' · Brand: ' + ${medicine.brand}"></span>
+                            <span th:if="${medicine.manufacturer}" th:text="' · ' + ${medicine.manufacturer}"></span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="two-col">
+                <div class="card">
+                    <h3 class="mt-0">Available at</h3>
+                    <div th:if="${result == null or #lists.isEmpty(result.offers)}" class="empty-state">
+                        <p>No pharmacy currently has this in stock.</p>
+                    </div>
+                    <div class="table-wrap" th:if="${result != null and not #lists.isEmpty(result.offers)}">
+                        <table>
+                            <thead><tr><th>Pharmacy</th><th>Price</th><th>Stock</th><th>Hours</th></tr></thead>
+                            <tbody>
+                            <tr th:each="offer : ${result.offers}">
+                                <td>
+                                    <span th:text="${offer.pharmacyName}">Lazz Pharma</span>
+                                    <span class="badge badge-verified" style="margin-left:6px;" th:if="${offer.verified}">✓</span>
+                                    <div class="text-sm text-muted" th:text="${offer.address}">Dhanmondi</div>
+                                </td>
+                                <td th:text="'৳' + ${offer.price}">৳3.50</td>
+                                <td>
+                                    <span class="badge badge-success" th:if="${offer.inStock}" th:text="${offer.quantity} + ' left'">In stock</span>
+                                    <span class="badge badge-danger" th:unless="${offer.inStock}">Out of stock</span>
+                                </td>
+                                <td th:text="${offer.openingHours}">9AM–10PM</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3 class="mt-0">Reserve this medicine</h3>
+                    <form th:action="@{/patient/reserve}" th:object="${reservationRequest}" method="post"
+                          th:if="${result != null and not #lists.isEmpty(result.offers)}">
+                        <!-- Plain name= (not th:field) since this hidden value must come from the
+                             page's ${medicine.id}, not from the (still-empty) bound reservationRequest
+                             object — Spring's binder matches on the name attribute either way. -->
+                        <input type="hidden" name="medicineId" th:value="${medicine.id}"/>
+                        <div class="form-group">
+                            <label for="pharmacyId">Pharmacy</label>
+                            <select id="pharmacyId" th:field="*{pharmacyId}" required>
+                                <option value="">Choose a pharmacy…</option>
+                                <option th:each="offer : ${result.offers}" th:if="${offer.inStock}"
+                                        th:value="${offer.pharmacyId}"
+                                        th:text="${offer.pharmacyName} + ' — ৳' + ${offer.price} + ' (' + ${offer.quantity} + ' left)'">
+                                    Lazz Pharma — ৳3.50
+                                </option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="quantity">Quantity</label>
+                            <input type="number" id="quantity" th:field="*{quantity}" min="1" value="1" required/>
+                        </div>
+                        <div class="form-group">
+                            <label for="paymentMethod">Payment method</label>
+                            <select id="paymentMethod" th:field="*{paymentMethod}" required>
+                                <option value="CASH_ON_PICKUP">Cash at pharmacy</option>
+                                <option value="ONLINE">Pay online now</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-block">Reserve</button>
+                        <p class="form-hint">You'll get a confirmation code to show at the counter. Reservations must be collected within the pickup window shown after you confirm.</p>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div th:replace="~{fragments/layout :: scripts}"></div>
+</body>
+</html>
