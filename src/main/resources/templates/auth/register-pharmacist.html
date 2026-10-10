@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Pharmacy sign up')}"></head>
+<body>
+<div th:replace="~{fragments/layout :: publicNav}"></div>
+
+<div class="auth-shell">
+    <div class="container-narrow auth-card" style="max-width:560px;">
+        <div class="card">
+            <h2>Register your pharmacy</h2>
+            <p class="text-sm text-muted">New pharmacies are reviewed by a MediFind admin before they appear in patient search — you can still sign in right away.</p>
+            <div th:replace="~{fragments/layout :: alerts}"></div>
+
+            <form th:action="@{/auth/register/pharmacist}" th:object="${registerPharmacistRequest}" method="post" id="pharmacistForm">
+                <h3 class="text-sm" style="text-transform:uppercase; letter-spacing:0.04em; color:var(--color-ink-soft);">Your staff login</h3>
+                <div class="form-group">
+                    <label for="fullName">Your full name</label>
+                    <input type="text" id="fullName" th:field="*{fullName}" required autofocus/>
+                    <div class="field-error" th:if="${#fields.hasErrors('fullName')}" th:errors="*{fullName}"></div>
+                </div>
+                <div class="form-group">
+                    <label for="email">Work email</label>
+                    <input type="email" id="email" th:field="*{email}" required/>
+                    <div class="field-error" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></div>
+                </div>
+                <div class="form-group">
+                    <label for="phone">Phone number</label>
+                    <input type="tel" id="phone" th:field="*{phone}" required/>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input type="password" id="password" th:field="*{password}" required/>
+                        <div class="field-error" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></div>
+                    </div>
+                    <div class="form-group">
+                        <label for="confirmPassword">Confirm password</label>
+                        <input type="password" id="confirmPassword" th:field="*{confirmPassword}" required/>
+                    </div>
+                </div>
+
+                <h3 class="text-sm" style="text-transform:uppercase; letter-spacing:0.04em; color:var(--color-ink-soft); margin-top:20px;">Pharmacy</h3>
+                <div class="form-group">
+                    <label>
+                        <input type="radio" name="joinExisting" value="false" checked onchange="toggleBranchMode()" style="width:auto; display:inline;"/>
+                        Register a new pharmacy branch
+                    </label>
+                    <label>
+                        <input type="radio" name="joinExisting" value="true" onchange="toggleBranchMode()" style="width:auto; display:inline;"/>
+                        Join an existing branch as additional staff
+                    </label>
+                </div>
+
+                <div id="newFields">
+                    <div class="form-group">
+                        <label for="pharmacyName">Pharmacy name</label>
+                        <input type="text" id="pharmacyName" th:field="*{pharmacyName}"/>
+                    </div>
+                    <div class="form-group">
+                        <label for="licenseNumber">License number</label>
+                        <input type="text" id="licenseNumber" th:field="*{licenseNumber}"/>
+                    </div>
+                    <div class="form-group">
+                        <label for="address">Address</label>
+                        <input type="text" id="address" th:field="*{address}"/>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="latitude">Latitude</label>
+                            <input type="number" step="0.000001" id="latitude" th:field="*{latitude}"/>
+                            <div class="form-hint">e.g. 23.7461 — find it by right-clicking your pharmacy on Google Maps.</div>
+                        </div>
+                        <div class="form-group">
+                            <label for="longitude">Longitude</label>
+                            <input type="number" step="0.000001" id="longitude" th:field="*{longitude}"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="pharmacyPhone">Pharmacy phone</label>
+                        <input type="tel" id="pharmacyPhone" th:field="*{pharmacyPhone}"/>
+                    </div>
+                    <div class="form-group">
+                        <label for="openingHours">Opening hours</label>
+                        <input type="text" id="openingHours" th:field="*{openingHours}" placeholder="e.g. 9:00 AM - 10:00 PM"/>
+                    </div>
+                </div>
+
+                <div id="existingFields" style="display:none;">
+                    <div class="form-group">
+                        <label for="existingLicenseNumber">Existing pharmacy's license number</label>
+                        <input type="text" id="existingLicenseNumber" th:field="*{existingLicenseNumber}"/>
+                        <div class="form-hint">Ask a colleague already registered for your branch's license number.</div>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-block">Create account</button>
+            </form>
+
+            <p class="text-sm text-muted" style="margin-top:16px;">
+                Already have an account? <a th:href="@{/auth/login}">Sign in</a>
+            </p>
+        </div>
+    </div>
+</div>
+
+<script>
+    function toggleBranchMode() {
+        var joinExisting = document.querySelector('input[name="joinExisting"]:checked').value === 'true';
+        document.getElementById('newFields').style.display = joinExisting ? 'none' : 'block';
+        document.getElementById('existingFields').style.display = joinExisting ? 'block' : 'none';
+    }
+</script>
+<div th:replace="~{fragments/layout :: scripts}"></div>
+</body>
+</html>
