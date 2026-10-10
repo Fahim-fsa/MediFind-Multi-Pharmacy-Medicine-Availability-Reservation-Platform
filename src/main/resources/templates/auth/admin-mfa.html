@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Verify your identity')}"></head>
+<body>
+<div th:replace="~{fragments/layout :: publicNav}"></div>
+
+<div class="auth-shell">
+    <div class="container-narrow auth-card">
+        <div class="card">
+            <div class="badge badge-neutral" style="margin-bottom:10px;">Admin Portal · Step 2 of 2</div>
+            <h2>Enter your verification code</h2>
+            <p class="text-sm text-muted">
+                We've sent a 6-digit code to your email (check the application console — MediFind
+                simulates email delivery for this demo rather than sending a real message; see the README).
+            </p>
+            <div th:replace="~{fragments/layout :: alerts}"></div>
+
+            <form th:action="@{/auth/admin-mfa}" method="post">
+                <div class="form-group">
+                    <label for="code">Verification code</label>
+                    <input type="text" id="code" name="code" inputmode="numeric" maxlength="6" pattern="[0-9]{6}" required autofocus/>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">Verify &amp; sign in</button>
+            </form>
+
+            <p class="text-sm text-muted" style="margin-top:16px;">
+                <a th:href="@{/auth/admin-login}">Start over</a>
+            </p>
+        </div>
+    </div>
+</div>
+
+<div th:replace="~{fragments/layout :: scripts}"></div>
+</body>
+</html>
