@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Notifications')}"></head>
+<body>
+<div class="app-shell">
+    <div th:replace="~{fragments/layout :: sidebarPharmacist('notifications')}"></div>
+    <div class="main-content">
+        <div th:replace="~{fragments/layout :: topbar('Notifications', '/pharmacist/notifications')}"></div>
+        <div class="content-body">
+            <div th:replace="~{fragments/layout :: alerts}"></div>
+
+            <div class="flex-between" style="margin-bottom:14px;">
+                <p class="text-sm text-muted mb-0">New reservations and low-stock alerts for your pharmacy.</p>
+                <form th:action="@{/pharmacist/notifications/mark-read}" method="post">
+                    <button type="submit" class="btn btn-secondary btn-sm">Mark all as read</button>
+                </form>
+            </div>
+
+            <div class="card" th:if="${#lists.isEmpty(notifications)}">
+                <div class="empty-state"><p>No notifications yet.</p></div>
+            </div>
+
+            <div class="card" th:each="n : ${notifications}" style="margin-bottom:10px; display:flex; align-items:flex-start; gap:12px;">
+                <span th:text="${n.isRead} ? '📭' : '📬'" style="font-size:1.3rem;"></span>
+                <div>
+                    <p class="mb-0" th:text="${n.message}">Message</p>
+                    <span class="text-sm text-muted" th:text="${#temporals.format(n.createdDate, 'dd MMM yyyy, h:mm a')}">Today</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div th:replace="~{fragments/layout :: scripts}"></div>
+</body>
+</html>
