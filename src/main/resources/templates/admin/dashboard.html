@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Admin dashboard')}"></head>
+<body>
+<div class="app-shell">
+    <div th:replace="~{fragments/layout :: sidebarAdmin('dashboard')}"></div>
+    <div class="main-content">
+        <div th:replace="~{fragments/layout :: topbar('Admin dashboard', '/admin/dashboard')}"></div>
+        <div class="content-body">
+            <div th:replace="~{fragments/layout :: alerts}"></div>
+
+            <div class="stat-grid">
+                <a th:href="@{/admin/listings}" class="stat-tile" style="text-decoration:none;">
+                    <div class="stat-value" th:text="${activePharmacies}">0</div>
+                    <div class="stat-label">Verified pharmacies</div>
+                </a>
+                <a th:href="@{/admin/verification}" class="stat-tile accent-warning" style="text-decoration:none;">
+                    <div class="stat-value" th:text="${pendingPharmacies}">0</div>
+                    <div class="stat-label">Pending verification</div>
+                </a>
+                <a th:href="@{/admin/users}" class="stat-tile" style="text-decoration:none;">
+                    <div class="stat-value" th:text="${activePatients}">0</div>
+                    <div class="stat-label">Active patients</div>
+                </a>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h3>Pharmacies awaiting review</h3>
+                    <a th:href="@{/admin/verification}" class="text-sm">Open verification queue →</a>
+                </div>
+                <div th:if="${#lists.isEmpty(pendingVerificationList)}" class="empty-state"><p>Nothing pending — you're all caught up.</p></div>
+                <table th:if="${not #lists.isEmpty(pendingVerificationList)}">
+                    <thead><tr><th>Pharmacy</th><th>License</th><th>Registered</th></tr></thead>
+                    <tbody>
+                    <tr th:each="p : ${pendingVerificationList}">
+                        <td th:text="${p.pharmacyName}">Popular Pharmacy</td>
+                        <td th:text="${p.licenseNumber}">LIC-0000</td>
+                        <td th:text="${#temporals.format(p.createdAt, 'dd MMM yyyy')}">Today</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<div th:replace="~{fragments/layout :: scripts}"></div>
+</body>
+</html>

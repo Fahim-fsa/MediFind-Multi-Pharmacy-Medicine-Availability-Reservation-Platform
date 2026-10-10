@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Admin Portal')}"></head>
+<body>
+<div th:replace="~{fragments/layout :: publicNav}"></div>
+
+<div class="auth-shell">
+    <div class="container-narrow auth-card">
+        <div class="card">
+            <div class="badge badge-neutral" style="margin-bottom:10px;">Admin Portal</div>
+            <h2>Admin sign in</h2>
+            <p class="text-sm text-muted">For platform administrators only. After your password, we'll email a one-time verification code to finish signing in.</p>
+            <div th:replace="~{fragments/layout :: alerts}"></div>
+
+            <form th:action="@{/auth/admin-login}" method="post">
+                <div class="form-group">
+                    <label for="email">Admin email</label>
+                    <input type="email" id="email" name="email" th:value="${email}" required autofocus/>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" required/>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">Continue</button>
+            </form>
+
+            <p class="text-sm text-muted" style="margin-top:16px;">
+                Not an admin? <a th:href="@{/auth/login}">Go to patient / pharmacy sign in</a>
+            </p>
+        </div>
+    </div>
+</div>
+
+<div th:replace="~{fragments/layout :: scripts}"></div>
+</body>
+</html>
