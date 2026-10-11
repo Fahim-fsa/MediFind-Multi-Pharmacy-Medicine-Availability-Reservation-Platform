@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Reports')}"></head>
+<body>
+
+<div th:fragment="reportCard(table, exportType, days)" th:if="${table} != null" class="card" style="margin-bottom:16px;">
+    <div class="card-header">
+        <h3 th:text="${table.title()}">Report title</h3>
+        <div class="flex gap-8">
+            <a th:href="@{/admin/reports/export(type=${exportType}, format='csv', days=${days})}" class="btn btn-secondary btn-sm">Export CSV</a>
+            <a th:href="@{/admin/reports/export(type=${exportType}, format='pdf', days=${days})}" class="btn btn-secondary btn-sm">Export PDF</a>
+        </div>
+    </div>
+    <div class="table-wrap">
+        <table>
+            <thead>
+            <tr><th th:each="h : ${table.headers()}" th:text="${h}">Column</th></tr>
+            </thead>
+            <tbody>
+            <tr th:each="row : ${table.rows()}">
+                <td th:each="cell : ${row}" th:text="${cell}"></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="empty-state" th:if="${#lists.isEmpty(table.rows())}"><p>No data yet.</p></div>
+</div>
+
+<div class="app-shell">
+    <div th:replace="~{fragments/layout :: sidebarAdmin('reports')}"></div>
+    <div class="main-content">
+        <div th:replace="~{fragments/layout :: topbar('Reports', '/admin/dashboard')}"></div>
+        <div class="content-body">
+            <div th:replace="~{fragments/layout :: alerts}"></div>
+
+            <form th:action="@{/admin/reports}" method="get" class="flex gap-12" style="align-items:flex-end; margin-bottom:18px;">
+                <div class="form-group mb-0">
+                    <label for="days">Daily reservations — last N days</label>
+                    <input type="number" id="days" name="days" min="1" max="90" th:value="${days}"/>
+                </div>
+                <button type="submit" class="btn btn-secondary">Update</button>
+            </form>
+
+            <div th:replace="~{::reportCard(${dailyReservations}, 'daily-reservations', ${days})}"></div>
+            <div th:replace="~{::reportCard(${mostSearched}, 'most-searched', ${days})}"></div>
+            <div th:replace="~{::reportCard(${activePharmacies}, 'active-pharmacies', ${days})}"></div>
+            <div th:replace="~{::reportCard(${activeUsers}, 'active-users', ${days})}"></div>
+        </div>
+    </div>
+</div>
+<div th:replace="~{fragments/layout :: scripts}"></div>
+</body>
+</html>
