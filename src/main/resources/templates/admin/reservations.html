@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Reservations')}"></head>
+<body>
+<div class="app-shell">
+    <div th:replace="~{fragments/layout :: sidebarAdmin('reservations')}"></div>
+    <div class="main-content">
+        <div th:replace="~{fragments/layout :: topbar('All reservations', '/admin/dashboard')}"></div>
+        <div class="content-body">
+            <div th:replace="~{fragments/layout :: alerts}"></div>
+
+            <div class="pill-tabs">
+                <a th:href="@{/admin/reservations}" th:classappend="${status == null} ? 'active'">All</a>
+                <a th:each="s : ${T(com.medifind.enums.ReservationStatus).values()}"
+                   th:href="@{/admin/reservations(status=${s})}"
+                   th:classappend="${status == s} ? 'active'" th:text="${s}"></a>
+            </div>
+
+            <div class="card">
+                <!-- One empty form per row for the Cancel action + its reason field, referenced
+                     via the HTML5 form="..." attribute (see pharmacist/inventory.html for why). -->
+                <form th:each="r : ${reservations.content}" th:if="${r.status.name() == 'RESERVED'}"
+                      th:id="'cancelForm' + ${r.id}" th:action="@{/admin/reservations/{id}/cancel(id=${r.id})}" method="post"></form>
+
+                <div class="table-wrap" th:if="${not #lists.isEmpty(reservations.content)}">
+                    <table>
+                        <thead><tr><th>Code</th><th>Patient</th><th>Pharmacy</th><th>Medicine</th><th>Status</th><th>Reserved</th><th></th></tr></thead>
+                        <tbody>
+                        <tr th:each="r : ${reservations.content}">
+                            <td><code th:text="${r.confirmationCode}">MF-XXXXXX</code></td>
+                            <td th:text="${r.patient.fullName}">Jane Doe</td>
+                            <td th:text="${r.pharmacy.pharmacyName}">Lazz Pharma</td>
+                            <td th:text="${r.quantity} + ' x ' + ${r.medicine.name}">2 x Napa</td>
+                            <td>
+                                <span class="badge"
+                                      th:classappend="${r.status.name() == 'RESERVED'} ? 'badge-warning' : (${r.status.name() == 'COLLECTED'} ? 'badge-success' : 'badge-danger')"
+                                      th:text="${r.status}">RESERVED</span>
+                            </td>
+                            <td th:text="${#temporals.format(r.reservedAt, 'dd MMM, h:mm a')}">Today</td>
+                            <td th:if="${r.status.name() == 'RESERVED'}">
+                                <input type="text" name="reason" placeholder="Reason" th:attr="form='cancelForm' + ${r.id}" style="width:110px; display:inline-block;" required/>
+                                <button type="submit" th:attr="form='cancelForm' + ${r.id}" class="btn btn-danger btn-sm">Cancel</button>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="empty-state" th:if="${#lists.isEmpty(reservations.content)}"><p>No reservations found.</p></div>
+
+                <div class="pagination" th:if="${reservations.totalPages > 1}">
+                    <span th:each="i : ${#numbers.sequence(0, reservations.totalPages - 1)}">
+                        <span th:if="${i == reservations.number}" class="current" th:text="${i + 1}">1</span>
+                        <a th:unless="${i == reservations.number}" th:href="@{/admin/reservations(page=${i}, status=${status})}" th:text="${i + 1}">2</a>
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div th:replace="~{fragments/layout :: scripts}"></div>
+</body>
+</html>
