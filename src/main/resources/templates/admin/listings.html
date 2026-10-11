@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Listings')}"></head>
+<body>
+<div class="app-shell">
+    <div th:replace="~{fragments/layout :: sidebarAdmin('listings')}"></div>
+    <div class="main-content">
+        <div th:replace="~{fragments/layout :: topbar('Pharmacy listings', '/admin/dashboard')}"></div>
+        <div class="content-body">
+            <div th:replace="~{fragments/layout :: alerts}"></div>
+
+            <div class="card" style="margin-bottom:18px;">
+                <div class="flex-between" style="flex-wrap:wrap; gap:12px;">
+                    <form th:action="@{/admin/listings}" method="get" class="flex gap-12" style="flex-wrap:wrap; align-items:flex-end;">
+                        <div class="form-group mb-0" style="flex:1; min-width:200px;">
+                            <label for="search">Search name or address</label>
+                            <input type="search" id="search" name="search" th:value="${search}"/>
+                        </div>
+                        <div class="form-group mb-0">
+                            <label for="status">Status</label>
+                            <select id="status" name="status">
+                                <option value="">All</option>
+                                <option th:each="s : ${T(com.medifind.enums.VerificationStatus).values()}"
+                                        th:value="${s}" th:text="${s}" th:selected="${s == status}"></option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-secondary">Filter</button>
+                    </form>
+                    <a th:href="@{/admin/listings/add}" class="btn btn-primary">+ Add pharmacy</a>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="table-wrap" th:if="${not #lists.isEmpty(pharmacies.content)}">
+                    <table>
+                        <thead><tr><th>Pharmacy</th><th>Address</th><th>Status</th><th>Registered</th><th></th></tr></thead>
+                        <tbody>
+                        <tr th:each="p : ${pharmacies.content}">
+                            <td th:text="${p.pharmacyName}">Lazz Pharma</td>
+                            <td th:text="${p.address}">Dhanmondi</td>
+                            <td>
+                                <span class="badge badge-success" th:if="${p.verificationStatus.name() == 'APPROVED'}">Approved</span>
+                                <span class="badge badge-warning" th:if="${p.verificationStatus.name() == 'PENDING'}">Pending</span>
+                                <span class="badge badge-danger" th:if="${p.verificationStatus.name() == 'REJECTED'}">Rejected</span>
+                            </td>
+                            <td th:text="${#temporals.format(p.createdAt, 'dd MMM yyyy')}">Today</td>
+                            <td class="flex gap-12" style="flex-wrap:wrap;">
+                                <a th:href="@{/admin/listings/{id}/inventory(id=${p.id})}" class="btn btn-secondary btn-sm">View inventory</a>
+                                <a th:href="@{/admin/listings/{id}/edit(id=${p.id})}" class="btn btn-secondary btn-sm">Edit</a>
+                                <form th:action="@{/admin/listings/{id}/delete(id=${p.id})}" method="post"
+                                      onsubmit="return confirm('Delete ' + this.dataset.name + '? This cannot be undone.');"
+                                      th:attr="data-name=${p.pharmacyName}">
+                                    <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                                </form>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="empty-state" th:if="${#lists.isEmpty(pharmacies.content)}">
+                    <p>No matching pharmacies.</p>
+                    <a th:href="@{/admin/listings/add}" class="btn btn-primary btn-sm">+ Add the first one</a>
+                </div>
+
+                <div class="pagination" th:if="${pharmacies.totalPages > 1}">
+                    <span th:each="i : ${#numbers.sequence(0, pharmacies.totalPages - 1)}">
+                        <span th:if="${i == pharmacies.number}" class="current" th:text="${i + 1}">1</span>
+                        <a th:unless="${i == pharmacies.number}" th:href="@{/admin/listings(page=${i}, status=${status}, search=${search})}" th:text="${i + 1}">2</a>
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div th:replace="~{fragments/layout :: scripts}"></div>
+</body>
+</html>
