@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head(${pharmacy.pharmacyName})}"></head>
+<body>
+<div class="app-shell">
+    <div th:replace="~{fragments/layout :: sidebarAdmin('listings')}"></div>
+    <div class="main-content" th:with="pageTitle=${pharmacy.pharmacyName} + ' — inventory'">
+        <div th:replace="~{fragments/layout :: topbar(${pageTitle}, '/admin/dashboard')}"></div>
+        <div class="content-body">
+            <div th:replace="~{fragments/layout :: alerts}"></div>
+            <p><a th:href="@{/admin/listings}">&larr; Back to listings</a></p>
+
+            <div class="card">
+                <div class="table-wrap" th:if="${not #lists.isEmpty(items)}">
+                    <table>
+                        <thead><tr><th>Medicine</th><th>Qty</th><th>Price</th><th>Availability</th><th>Last updated</th><th></th></tr></thead>
+                        <tbody>
+                        <tr th:each="item : ${items}">
+                            <td>
+                                <div class="flex gap-12" style="align-items:center;">
+                                    <img th:if="${item.medicine.imageUrl}" th:src="@{${item.medicine.imageUrl}}"
+                                         class="medicine-thumb" alt=""/>
+                                    <span th:unless="${item.medicine.imageUrl}" class="medicine-thumb medicine-thumb-placeholder" aria-hidden="true">💊</span>
+                                    <span th:text="${item.medicine.name}">Napa</span>
+                                </div>
+                            </td>
+                            <td th:text="${item.quantity}">50</td>
+                            <td th:text="'৳' + ${item.price}">৳3.50</td>
+                            <td th:text="${item.availabilityStatus}">AVAILABLE</td>
+                            <td th:text="${#temporals.format(item.lastUpdated, 'dd MMM, h:mm a')}">Today</td>
+                            <td>
+                                <form th:action="@{/admin/listings/inventory/{id}/remove(id=${item.id})}" method="post"
+                                      onsubmit="return confirm('Remove this listing from the catalogue? This cannot be undone.');">
+                                    <input type="hidden" name="pharmacyId" th:value="${pharmacy.id}"/>
+                                    <button type="submit" class="btn btn-danger btn-sm">Remove</button>
+                                </form>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="empty-state" th:if="${#lists.isEmpty(items)}"><p>This pharmacy has no listings.</p></div>
+            </div>
+        </div>
+    </div>
+</div>
+<div th:replace="~{fragments/layout :: scripts}"></div>
+</body>
+</html>
