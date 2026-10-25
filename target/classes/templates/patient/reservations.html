@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('My reservations')}"></head>
+<body>
+<div class="app-shell">
+    <div th:replace="~{fragments/layout :: sidebarPatient('reservations')}"></div>
+    <div class="main-content">
+        <div th:replace="~{fragments/layout :: topbar('My reservations', '/patient/notifications')}"></div>
+        <div class="content-body">
+            <div th:replace="~{fragments/layout :: alerts}"></div>
+
+            <div class="card" style="margin-bottom:18px;">
+                <form th:action="@{/patient/reservations}" method="get" class="flex gap-12" style="flex-wrap:wrap; align-items:flex-end;">
+                    <div class="form-group mb-0">
+                        <label for="status">Status</label>
+                        <select id="status" name="status">
+                            <option value="">All</option>
+                            <option th:each="s : ${T(com.medifind.enums.ReservationStatus).values()}"
+                                    th:value="${s}" th:text="${s}" th:selected="${s == status}"></option>
+                        </select>
+                    </div>
+                    <div class="form-group mb-0">
+                        <label for="from">From</label>
+                        <input type="date" id="from" name="from" th:value="${from}"/>
+                    </div>
+                    <div class="form-group mb-0">
+                        <label for="to">To</label>
+                        <input type="date" id="to" name="to" th:value="${to}"/>
+                    </div>
+                    <button type="submit" class="btn btn-secondary">Filter</button>
+                    <a th:href="@{/patient/reservations}" class="btn btn-ghost">Clear</a>
+                </form>
+            </div>
+
+            <div class="card">
+                <div class="table-wrap" th:if="${not #lists.isEmpty(reservations.content)}">
+                    <table>
+                        <thead>
+                        <tr><th>Medicine</th><th>Pharmacy</th><th>Qty</th><th>Code</th><th>Status</th><th>Reserved</th><th>Pickup by</th><th></th></tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="r : ${reservations.content}">
+                            <td th:text="${r.medicine.name}">Napa</td>
+                            <td th:text="${r.pharmacy.pharmacyName}">Lazz Pharma</td>
+                            <td th:text="${r.quantity}">2</td>
+                            <td><code th:text="${r.confirmationCode}">MF-XXXXXX</code></td>
+                            <td>
+                                <span class="badge"
+                                      th:classappend="${r.status.name() == 'RESERVED'} ? 'badge-warning' : (${r.status.name() == 'COLLECTED'} ? 'badge-success' : 'badge-danger')"
+                                      th:text="${r.status}">RESERVED</span>
+                            </td>
+                            <td th:text="${#temporals.format(r.reservedAt, 'dd MMM, h:mm a')}">Today</td>
+                            <td th:text="${#temporals.format(r.pickupDeadline, 'dd MMM, h:mm a')}">Tomorrow</td>
+                            <td>
+                                <form th:action="@{/patient/reservations/{id}/cancel(id=${r.id})}" method="post"
+                                      th:if="${r.status.name() == 'RESERVED'}"
+                                      onsubmit="return confirm('Cancel this reservation?');">
+                                    <button type="submit" class="btn btn-danger btn-sm">Cancel</button>
+                                </form>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="empty-state" th:if="${#lists.isEmpty(reservations.content)}">
+                    <p>No reservations match these filters.</p>
+                </div>
+
+                <div class="pagination" th:if="${reservations.totalPages > 1}">
+                    <span th:each="i : ${#numbers.sequence(0, reservations.totalPages - 1)}">
+                        <span th:if="${i == reservations.number}" class="current" th:text="${i + 1}">1</span>
+                        <a th:unless="${i == reservations.number}"
+                           th:href="@{/patient/reservations(page=${i}, status=${status}, from=${from}, to=${to})}"
+                           th:text="${i + 1}">2</a>
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div th:replace="~{fragments/layout :: scripts}"></div>
+</body>
+</html>

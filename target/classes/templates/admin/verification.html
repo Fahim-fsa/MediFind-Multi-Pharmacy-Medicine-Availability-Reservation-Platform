@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Pharmacy verification')}"></head>
+<body>
+<div class="app-shell">
+    <div th:replace="~{fragments/layout :: sidebarAdmin('verification')}"></div>
+    <div class="main-content">
+        <div th:replace="~{fragments/layout :: topbar('Pharmacy verification', '/admin/dashboard')}"></div>
+        <div class="content-body">
+            <div th:replace="~{fragments/layout :: alerts}"></div>
+
+            <div class="empty-state card" th:if="${#lists.isEmpty(pending)}">
+                <p>No pharmacies waiting on review.</p>
+            </div>
+
+            <div class="card" th:each="p : ${pending}" style="margin-bottom:16px;">
+                <div class="flex-between">
+                    <div>
+                        <h3 class="mb-0" th:text="${p.pharmacyName}">Popular Pharmacy</h3>
+                        <span class="text-sm text-muted" th:text="${p.address}">Mirpur 10, Dhaka</span>
+                    </div>
+                    <span class="badge badge-warning">
+                        Waiting <span th:text="${#temporals.format(p.createdAt, 'dd MMM')}">since</span>
+                    </span>
+                </div>
+                <div class="two-col" style="margin-top:12px;">
+                    <div class="text-sm">
+                        <div><strong>License:</strong> <span th:text="${p.licenseNumber}">LIC-000</span></div>
+                        <div><strong>Phone:</strong> <span th:text="${p.phone}">+880...</span></div>
+                        <div><strong>Coordinates:</strong> <span th:text="${p.latitude} + ', ' + ${p.longitude}">23.7, 90.4</span></div>
+                        <div><strong>Opening hours:</strong> <span th:text="${p.openingHours}">—</span></div>
+                    </div>
+                    <div>
+                        <form th:action="@{/admin/verification/{id}/approve(id=${p.id})}" method="post"
+                              onsubmit="return confirm('Approve this pharmacy? It will immediately appear in patient search.');"
+                              style="margin-bottom:10px;">
+                            <button type="submit" class="btn btn-primary btn-block">Approve</button>
+                        </form>
+                        <form th:action="@{/admin/verification/{id}/reject(id=${p.id})}" method="post" class="flex gap-8">
+                            <input type="text" name="reason" placeholder="Reason for rejection" required style="flex:1;"/>
+                            <button type="submit" class="btn btn-danger">Reject</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div th:replace="~{fragments/layout :: scripts}"></div>
+</body>
+</html>

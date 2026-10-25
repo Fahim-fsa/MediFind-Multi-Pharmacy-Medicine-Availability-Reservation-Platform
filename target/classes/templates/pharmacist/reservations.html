@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Reservations')}"></head>
+<body>
+<div class="app-shell">
+    <div th:replace="~{fragments/layout :: sidebarPharmacist('reservations')}"></div>
+    <div class="main-content">
+        <div th:replace="~{fragments/layout :: topbar('Incoming reservations', '/pharmacist/notifications')}"></div>
+        <div class="content-body">
+            <div th:replace="~{fragments/layout :: alerts}"></div>
+
+            <div class="card">
+                <div class="flex-between" style="margin-bottom:10px;">
+                    <p class="text-sm text-muted mb-0">Oldest first — this list refreshes automatically every 20 seconds.</p>
+                    <span class="badge badge-neutral" id="queueCount" th:text="${#lists.size(queue)} + ' waiting'">0 waiting</span>
+                </div>
+
+                <div class="table-wrap" id="queueTableWrap" th:if="${not #lists.isEmpty(queue)}">
+                    <table id="queueTable">
+                        <thead>
+                        <tr><th>Reserved</th><th>Patient</th><th>Phone</th><th>Medicine</th><th>Qty</th><th>Code</th><th>Pickup by</th><th></th></tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="item : ${queue}">
+                            <td th:text="${#temporals.format(item.reservedAt, 'dd MMM, h:mm a')}">Today</td>
+                            <td th:text="${item.patientName}">Jane Doe</td>
+                            <td th:text="${item.maskedPhone}">*******890</td>
+                            <td th:text="${item.medicineName}">Napa</td>
+                            <td th:text="${item.quantity}">2</td>
+                            <td><code th:text="${item.confirmationCode}">MF-XXXXXX</code></td>
+                            <td th:text="${#temporals.format(item.pickupDeadline, 'dd MMM, h:mm a')}">Tomorrow</td>
+                            <td class="flex gap-8">
+                                <form th:action="@{/pharmacist/reservations/{id}/collect(id=${item.reservationId})}" method="post">
+                                    <button type="submit" class="btn btn-primary btn-sm">Mark collected</button>
+                                </form>
+                                <form th:action="@{/pharmacist/reservations/{id}/reject(id=${item.reservationId})}" method="post"
+                                      onsubmit="return confirm('Reject this reservation? Stock will be restored.');">
+                                    <button type="submit" class="btn btn-danger btn-sm">Reject</button>
+                                </form>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="empty-state" id="emptyQueueState" th:if="${#lists.isEmpty(queue)}">
+                    <p>No reservations waiting right now.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div th:replace="~{fragments/layout :: scripts}"></div>
+<script th:src="@{/js/reservation-poll.js}"></script>
+</body>
+</html>

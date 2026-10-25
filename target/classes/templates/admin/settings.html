@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Settings')}"></head>
+<body>
+<div class="app-shell">
+    <div th:replace="~{fragments/layout :: sidebarAdmin('settings')}"></div>
+    <div class="main-content">
+        <div th:replace="~{fragments/layout :: topbar('Platform settings', '/admin/dashboard')}"></div>
+        <div class="content-body">
+            <div th:replace="~{fragments/layout :: alerts}"></div>
+            <p class="text-sm text-muted">Changes take effect immediately and are recorded in the audit log.</p>
+
+            <div class="card" th:each="s : ${settings}" style="margin-bottom:14px;">
+                <form th:action="@{/admin/settings/{id}/update(id=${s.id})}" method="post">
+                    <div class="flex-between" style="align-items:flex-start;">
+                        <div style="flex:1; margin-right:16px;">
+                            <label th:for="'value' + ${s.id}" th:text="${s.settingKey}">setting.key</label>
+                            <p class="text-sm text-muted mt-0" th:text="${s.description}">Description</p>
+                        </div>
+                        <div class="flex gap-8">
+                            <input type="text" th:id="'value' + ${s.id}" name="value" th:value="${s.settingValue}" style="min-width:260px;"/>
+                            <button type="submit" class="btn btn-secondary">Save</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<div th:replace="~{fragments/layout :: scripts}"></div>
+</body>
+</html>
