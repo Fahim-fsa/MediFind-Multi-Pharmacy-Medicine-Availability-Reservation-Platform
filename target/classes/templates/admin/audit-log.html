@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Audit log')}"></head>
+<body>
+<div class="app-shell">
+    <div th:replace="~{fragments/layout :: sidebarAdmin('audit')}"></div>
+    <div class="main-content">
+        <div th:replace="~{fragments/layout :: topbar('Audit log', '/admin/dashboard')}"></div>
+        <div class="content-body">
+            <div th:replace="~{fragments/layout :: alerts}"></div>
+            <p class="text-sm text-muted">Every pharmacy approval/rejection, account suspension, disputed-reservation cancellation, listing removal, and settings change is recorded here — newest first.</p>
+
+            <div class="card">
+                <div class="table-wrap" th:if="${not #lists.isEmpty(entries.content)}">
+                    <table>
+                        <thead><tr><th>When</th><th>Admin</th><th>Action</th><th>Before</th><th>After</th></tr></thead>
+                        <tbody>
+                        <tr th:each="e : ${entries.content}">
+                            <td th:text="${#temporals.format(e.timestamp, 'dd MMM yyyy, h:mm a')}">Today</td>
+                            <td th:text="${e.admin != null ? e.admin.fullName : 'System'}">Admin</td>
+                            <td th:text="${e.action}">APPROVE_PHARMACY</td>
+                            <td class="text-sm text-muted" th:text="${e.oldValue}">—</td>
+                            <td class="text-sm text-muted" th:text="${e.newValue}">—</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="empty-state" th:if="${#lists.isEmpty(entries.content)}"><p>No admin actions recorded yet.</p></div>
+
+                <div class="pagination" th:if="${entries.totalPages > 1}">
+                    <span th:each="i : ${#numbers.sequence(0, entries.totalPages - 1)}">
+                        <span th:if="${i == entries.number}" class="current" th:text="${i + 1}">1</span>
+                        <a th:unless="${i == entries.number}" th:href="@{/admin/audit-log(page=${i})}" th:text="${i + 1}">2</a>
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div th:replace="~{fragments/layout :: scripts}"></div>
+</body>
+</html>

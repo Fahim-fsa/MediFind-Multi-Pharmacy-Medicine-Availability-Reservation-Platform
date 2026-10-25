@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Dashboard')}"></head>
+<body>
+<div class="app-shell">
+    <div th:replace="~{fragments/layout :: sidebarPharmacist('dashboard')}"></div>
+    <div class="main-content">
+        <div th:replace="~{fragments/layout :: topbar('Dashboard', '/pharmacist/notifications')}"></div>
+        <div class="content-body">
+            <div th:replace="~{fragments/layout :: alerts}"></div>
+
+            <div class="card" style="margin-bottom:20px;" th:if="${pharmacy.verificationStatus.name() == 'PENDING'}">
+                <span class="badge badge-warning">Pending verification</span>
+                <p class="text-sm" style="margin-top:8px;">Your pharmacy is awaiting admin review and won't appear in patient search yet. You can still set up your inventory now.</p>
+            </div>
+            <div class="card" style="margin-bottom:20px;" th:if="${pharmacy.verificationStatus.name() == 'REJECTED'}">
+                <span class="badge badge-danger">Verification rejected</span>
+                <p class="text-sm" style="margin-top:8px;" th:text="${pharmacy.rejectionReason}">Reason</p>
+            </div>
+
+            <h3 class="mt-0" th:text="${pharmacy.pharmacyName}">Lazz Pharma</h3>
+
+            <div class="stat-grid">
+                <a th:href="@{/pharmacist/reservations}" class="stat-tile accent-warning" style="text-decoration:none;">
+                    <div class="stat-value" th:text="${queueSize}">0</div>
+                    <div class="stat-label">Reservations awaiting pickup</div>
+                </a>
+                <a th:href="@{/pharmacist/inventory}" class="stat-tile" style="text-decoration:none;">
+                    <div class="stat-value" th:text="${totalListings}">0</div>
+                    <div class="stat-label">Medicines listed</div>
+                </a>
+                <a th:href="@{/pharmacist/inventory}" class="stat-tile accent-danger" style="text-decoration:none;">
+                    <div class="stat-value" th:text="${#lists.size(lowStockItems)}">0</div>
+                    <div class="stat-label">Low stock items</div>
+                </a>
+            </div>
+
+            <div class="two-col">
+                <div class="card">
+                    <div class="card-header">
+                        <h3>Next in queue</h3>
+                        <a th:href="@{/pharmacist/reservations}" class="text-sm">View all →</a>
+                    </div>
+                    <div th:if="${#lists.isEmpty(recentQueue)}" class="empty-state"><p>Nothing waiting right now.</p></div>
+                    <table th:if="${not #lists.isEmpty(recentQueue)}">
+                        <thead><tr><th>Patient</th><th>Medicine</th><th>Code</th></tr></thead>
+                        <tbody>
+                        <tr th:each="item : ${recentQueue}">
+                            <td th:text="${item.patientName}">Jane</td>
+                            <td th:text="${item.quantity} + ' x ' + ${item.medicineName}">2 x Napa</td>
+                            <td><code th:text="${item.confirmationCode}">MF-XXXXXX</code></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <h3>Low stock</h3>
+                        <a th:href="@{/pharmacist/inventory}" class="text-sm">Manage →</a>
+                    </div>
+                    <div th:if="${#lists.isEmpty(lowStockItems)}" class="empty-state"><p>All stocked up.</p></div>
+                    <table th:if="${not #lists.isEmpty(lowStockItems)}">
+                        <thead><tr><th>Medicine</th><th>Qty left</th></tr></thead>
+                        <tbody>
+                        <tr th:each="item : ${lowStockItems}">
+                            <td th:text="${item.medicine.name}">Napa</td>
+                            <td th:text="${item.quantity}">3</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div th:replace="~{fragments/layout :: scripts}"></div>
+</body>
+</html>

@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Dashboard')}"></head>
+<body>
+<div class="app-shell">
+    <div th:replace="~{fragments/layout :: sidebarPatient('dashboard')}"></div>
+    <div class="main-content">
+        <div th:replace="~{fragments/layout :: topbar('Dashboard', '/patient/notifications')}"></div>
+        <div class="content-body">
+            <div th:replace="~{fragments/layout :: alerts}"></div>
+
+            <div class="card" style="margin-bottom:20px;">
+                <h3 class="mt-0">Hi <span th:text="${patient.fullName}">there</span> 👋</h3>
+                <p class="text-sm">Search for a medicine to compare price and stock at nearby pharmacies.</p>
+                <form th:action="@{/patient/search}" method="get" class="flex gap-12">
+                    <input type="search" name="q" placeholder="Search medicine, generic name, or brand…" style="flex:1;"/>
+                    <button type="submit" class="btn btn-primary">Search</button>
+                </form>
+            </div>
+
+            <div class="stat-grid">
+                <a th:href="@{/patient/reservations}" class="stat-tile" style="text-decoration:none;">
+                    <div class="stat-value" th:text="${#lists.size(recentReservations)}">0</div>
+                    <div class="stat-label">Recent reservations</div>
+                </a>
+                <a th:href="@{/patient/pharmacy-map}" class="stat-tile accent-warning" style="text-decoration:none;">
+                    <div class="stat-value">🗺️</div>
+                    <div class="stat-label">View pharmacy map</div>
+                </a>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h3>Recent reservations</h3>
+                    <a th:href="@{/patient/reservations}" class="text-sm">View all →</a>
+                </div>
+                <div class="table-wrap" th:if="${not #lists.isEmpty(recentReservations)}">
+                    <table>
+                        <thead>
+                        <tr><th>Medicine</th><th>Pharmacy</th><th>Code</th><th>Status</th><th>Reserved</th></tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="r : ${recentReservations}">
+                            <td th:text="${r.medicine.name}">Napa</td>
+                            <td th:text="${r.pharmacy.pharmacyName}">Lazz Pharma</td>
+                            <td><code th:text="${r.confirmationCode}">MF-XXXXXX</code></td>
+                            <td>
+                                <span class="badge"
+                                      th:classappend="${r.status.name() == 'RESERVED'} ? 'badge-warning' : (${r.status.name() == 'COLLECTED'} ? 'badge-success' : 'badge-danger')"
+                                      th:text="${r.status}">RESERVED</span>
+                            </td>
+                            <td th:text="${#temporals.format(r.reservedAt, 'dd MMM, h:mm a')}">Today</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="empty-state" th:if="${#lists.isEmpty(recentReservations)}">
+                    <p>No reservations yet — search for a medicine to get started.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div th:replace="~{fragments/layout :: scripts}"></div>
+</body>
+</html>

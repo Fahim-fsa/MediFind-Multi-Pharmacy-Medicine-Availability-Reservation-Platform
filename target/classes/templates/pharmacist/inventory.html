@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Inventory')}"></head>
+<body>
+<div class="app-shell">
+    <div th:replace="~{fragments/layout :: sidebarPharmacist('inventory')}"></div>
+    <div class="main-content">
+        <div th:replace="~{fragments/layout :: topbar('Inventory', '/pharmacist/notifications')}"></div>
+        <div class="content-body">
+            <div th:replace="~{fragments/layout :: alerts}"></div>
+
+            <div class="card" style="margin-bottom:20px;">
+                <h3 class="mt-0">Add a medicine to your inventory</h3>
+                <form th:action="@{/pharmacist/inventory/add}" th:object="${inventoryItemRequest}" method="post" enctype="multipart/form-data">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="name">Medicine name</label>
+                            <input type="text" id="name" th:field="*{name}" required/>
+                        </div>
+                        <div class="form-group">
+                            <label for="genericName">Generic name</label>
+                            <input type="text" id="genericName" th:field="*{genericName}" required/>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="brand">Brand</label>
+                            <input type="text" id="brand" th:field="*{brand}"/>
+                        </div>
+                        <div class="form-group">
+                            <label for="manufacturer">Manufacturer</label>
+                            <input type="text" id="manufacturer" th:field="*{manufacturer}"/>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="categoryId">Category</label>
+                            <select id="categoryId" th:field="*{categoryId}">
+                                <option value="">Uncategorised</option>
+                                <option th:each="c : ${categories}" th:value="${c.id}" th:text="${c.name}"></option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="image">Photo (optional)</label>
+                            <input type="file" id="image" th:field="*{image}" accept="image/png,image/jpeg,image/webp"/>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="quantity">Quantity</label>
+                            <input type="number" id="quantity" th:field="*{quantity}" min="0" required/>
+                        </div>
+                        <div class="form-group">
+                            <label for="price">Price (৳)</label>
+                            <input type="number" id="price" th:field="*{price}" min="0" step="0.01" required/>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="availabilityStatus">Availability</label>
+                            <select id="availabilityStatus" th:field="*{availabilityStatus}">
+                                <option value="AVAILABLE">Available</option>
+                                <option value="UNAVAILABLE">Unavailable</option>
+                            </select>
+                        </div>
+                        <div class="form-group"></div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Add to inventory</button>
+                    <p class="form-hint">Already listed at your pharmacy under this exact name and brand? Edit that row below instead. A photo is only used the first time a medicine is added to MediFind's shared catalogue — it isn't asked for again once another pharmacy has already added one.</p>
+                </form>
+            </div>
+
+            <div class="card">
+                <h3 class="mt-0">Your listings</h3>
+                <!-- One (empty) form per row, declared here rather than nested inside <tr>/<td> —
+                     table rows can't validly contain a <form> element. Each input/button below
+                     references its row's form purely via the HTML5 form="..." attribute instead. -->
+                <form th:each="item : ${items}" th:id="'updateForm' + ${item.id}"
+                      th:action="@{/pharmacist/inventory/{id}/update(id=${item.id})}" method="post"></form>
+
+                <div class="table-wrap" th:if="${not #lists.isEmpty(items)}">
+                    <table>
+                        <thead>
+                        <tr><th>Medicine</th><th>Qty</th><th>Price (৳)</th><th>Availability</th><th>Last updated</th><th></th></tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="item : ${items}">
+                            <td>
+                                <div class="flex gap-12" style="align-items:center;">
+                                    <img th:if="${item.medicine.imageUrl}" th:src="@{${item.medicine.imageUrl}}"
+                                         class="medicine-thumb" alt=""/>
+                                    <span th:unless="${item.medicine.imageUrl}" class="medicine-thumb medicine-thumb-placeholder" aria-hidden="true">💊</span>
+                                    <div>
+                                        <strong th:text="${item.medicine.name}">Napa</strong>
+                                        <div class="text-sm text-muted" th:text="${item.medicine.genericName}">Paracetamol</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td><input type="number" name="quantity" th:value="${item.quantity}" th:attr="form='updateForm' + ${item.id}" min="0" style="width:80px;" required/></td>
+                            <td><input type="number" name="price" th:value="${item.price}" th:attr="form='updateForm' + ${item.id}" min="0" step="0.01" style="width:100px;" required/></td>
+                            <td>
+                                <select name="availabilityStatus" th:attr="form='updateForm' + ${item.id}" style="width:140px;">
+                                    <option value="AVAILABLE" th:selected="${item.availabilityStatus.name() == 'AVAILABLE'}">Available</option>
+                                    <option value="UNAVAILABLE" th:selected="${item.availabilityStatus.name() == 'UNAVAILABLE'}">Unavailable</option>
+                                </select>
+                            </td>
+                            <td class="text-sm text-muted" th:text="${#temporals.format(item.lastUpdated, 'dd MMM, h:mm a')}">Today</td>
+                            <td><button type="submit" th:attr="form='updateForm' + ${item.id}" class="btn btn-secondary btn-sm">Save</button></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="empty-state" th:if="${#lists.isEmpty(items)}">
+                    <p>No medicines listed yet — add your first one above.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div th:replace="~{fragments/layout :: scripts}"></div>
+</body>
+</html>

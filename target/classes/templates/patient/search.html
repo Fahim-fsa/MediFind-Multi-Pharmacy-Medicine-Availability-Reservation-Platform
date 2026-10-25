@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Search medicine')}"></head>
+<body>
+<div class="app-shell">
+    <div th:replace="~{fragments/layout :: sidebarPatient('search')}"></div>
+    <div class="main-content">
+        <div th:replace="~{fragments/layout :: topbar('Search medicine', '/patient/notifications')}"></div>
+        <div class="content-body">
+            <div th:replace="~{fragments/layout :: alerts}"></div>
+
+            <div class="card" style="margin-bottom:20px;">
+                <form th:action="@{/patient/search}" method="get" id="searchForm">
+                    <div class="flex gap-12" style="align-items:flex-end; flex-wrap:wrap;">
+                        <div class="form-group mb-0" style="flex:2; min-width:220px;">
+                            <label for="q">Medicine, generic name, or brand</label>
+                            <input type="search" id="q" name="q" th:value="${query}" required autofocus/>
+                        </div>
+                        <div class="form-group mb-0" style="flex:1; min-width:160px;">
+                            <label for="maxDistanceKm">Max distance (km)</label>
+                            <input type="number" id="maxDistanceKm" name="maxDistanceKm" min="0" step="0.5" th:value="${maxDistanceKm}" placeholder="Any"/>
+                        </div>
+                        <input type="hidden" id="lat" name="lat"/>
+                        <input type="hidden" id="lng" name="lng"/>
+                        <button type="button" class="btn btn-secondary" id="useLocationBtn">📍 Use my location</button>
+                        <button type="submit" class="btn btn-primary">Search</button>
+                    </div>
+                    <p class="form-hint" id="locationStatus"></p>
+                </form>
+            </div>
+
+            <div th:if="${query != null and not #strings.isEmpty(query)}">
+                <p class="text-sm text-muted" th:text="${#lists.size(results)} + ' medicine(s) found for &quot;' + ${query} + '&quot;'"></p>
+
+                <div class="card" th:each="row : ${results}" style="margin-bottom:16px;">
+                    <div class="card-header">
+                        <div class="flex gap-12" style="align-items:center;">
+                            <img th:if="${row.imageUrl}" th:src="@{${row.imageUrl}}" class="medicine-thumb" alt=""
+                                 style="width:48px; height:48px;"/>
+                            <span th:unless="${row.imageUrl}" class="medicine-thumb medicine-thumb-placeholder" aria-hidden="true"
+                                  style="width:48px; height:48px; font-size:22px;">💊</span>
+                            <div>
+                                <h3 class="mb-0" th:text="${row.name}">Napa</h3>
+                                <span class="text-sm text-muted" th:text="${row.genericName} + (${row.brand} != null ? ' · ' + ${row.brand} : '')">Paracetamol</span>
+                            </div>
+                        </div>
+                        <span class="badge badge-neutral" th:if="${row.categoryName}" th:text="${row.categoryName}">Analgesic</span>
+                    </div>
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                            <tr><th>Pharmacy</th><th>Price</th><th>Stock</th><th>Distance</th><th>Hours</th><th></th></tr>
+                            </thead>
+                            <tbody>
+                            <tr th:each="offer : ${row.offers}">
+                                <td>
+                                    <a th:href="@{/patient/pharmacy/{id}(id=${offer.pharmacyId})}" th:text="${offer.pharmacyName}">Lazz Pharma</a>
+                                    <span class="badge badge-verified" style="margin-left:6px;" th:if="${offer.verified}">✓ Verified</span>
+                                    <div class="text-sm text-muted" th:text="${offer.address}">Dhanmondi</div>
+                                </td>
+                                <td th:text="'৳' + ${offer.price}">৳3.50</td>
+                                <td>
+                                    <span class="badge badge-success" th:if="${offer.inStock}" th:text="${offer.quantity} + ' in stock'">In stock</span>
+                                    <span class="badge badge-danger" th:unless="${offer.inStock}">Out of stock</span>
+                                </td>
+                                <td th:text="${offer.distanceKm != null ? offer.distanceKm + ' km' : '—'}">—</td>
+                                <td th:text="${offer.openingHours}">9AM–10PM</td>
+                                <td>
+                                    <a th:href="@{/patient/medicine/{id}(id=${row.medicineId})}" class="btn btn-primary btn-sm">View &amp; reserve</a>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="empty-state" th:if="${#lists.isEmpty(results)}">
+                    <p>No pharmacy currently has "<span th:text="${query}"></span>" in stock.</p>
+                </div>
+            </div>
+
+            <div class="empty-state" th:if="${query == null or #strings.isEmpty(query)}">
+                <p>Search for a medicine above to see which nearby pharmacies have it.</p>
+            </div>
+        </div>
+    </div>
+</div>
+<div th:replace="~{fragments/layout :: scripts}"></div>
+<script th:src="@{/js/search.js}"></script>
+</body>
+</html>
